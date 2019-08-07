@@ -81,10 +81,12 @@ static struct {
 #define REVID_MASK	0xFFFF0000
 #define DEVID_MASK	0xFFF
 
-#ifndef BOARD_PIN_VBUS
-# define BOARD_PIN_VBUS                 GPIO9
+// A board may disable VBUS sensing, but still provide a (non-standard) VBUS
+// sensing pin (and use it for fast booting when USB is disconnected). If VBUS
+// sensing is enabled, only PA9 can be used.
+#ifndef BOARD_USB_VBUS_SENSE_DISABLED
 # define BOARD_PORT_VBUS                GPIOA
-# define BOARD_CLOCK_VBUS               RCC_AHB1ENR_IOPAEN
+# define BOARD_PIN_VBUS                 GPIO9
 #endif
 
 /* magic numbers from reference manual */
@@ -370,8 +372,10 @@ board_init(void)
 #endif
 
 #if INTERFACE_USB
-
-	rcc_peripheral_enable_clock(&RCC_AHB1ENR, BOARD_CLOCK_VBUS);
+#if !defined(BOARD_USB_VBUS_SENSE_DISABLED)
+	/* enable configured GPIO to sample VBUS */
+	rcc_peripheral_enable_clock(&RCC_AHB1ENR, RCC_AHB1ENR_IOPAEN);
+#endif
 #endif
 
 #if INTERFACE_USART
@@ -383,8 +387,8 @@ board_init(void)
 	gpio_mode_setup(BOARD_PORT_USART_TX, GPIO_MODE_AF, GPIO_PUPD_PULLUP, BOARD_PIN_TX);
 	gpio_mode_setup(BOARD_PORT_USART_RX, GPIO_MODE_AF, GPIO_PUPD_PULLUP, BOARD_PIN_RX);
 	/* Setup USART TX & RX pins as alternate function. */
-	gpio_set_af(BOARD_PORT_USART_TX, BOARD_PORT_USART_AF, BOARD_PIN_TX);
-	gpio_set_af(BOARD_PORT_USART_RX, BOARD_PORT_USART_AF, BOARD_PIN_RX);
+	gpio_set_af(BOARD_PORT_USART_TX, BOARD_PORT_USART_AF_TX, BOARD_PIN_TX);
+	gpio_set_af(BOARD_PORT_USART_RX, BOARD_PORT_USART_AF_RX, BOARD_PIN_RX);
 
 	/* configure USART clock */
 	rcc_peripheral_enable_clock(&BOARD_USART_CLOCK_REGISTER, BOARD_USART_CLOCK_BIT);
@@ -802,15 +806,16 @@ main(void)
 	 * If the force-bootloader pins are tied, we will stay here until they are removed and
 	 * we then time out.
 	 */
-#if defined(BOARD_USB_VBUS_SENSE_DISABLED)
-	try_boot = false;
-#else
+#if defined(BOARD_PORT_VBUS)
 
 	if (gpio_get(BOARD_PORT_VBUS, BOARD_PIN_VBUS) != 0) {
 		usb_connected = true;
 		/* don't try booting before we set up the bootloader */
 		try_boot = false;
 	}
+
+#else
+	try_boot = false;
 
 #endif
 #endif

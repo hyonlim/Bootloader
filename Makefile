@@ -53,10 +53,13 @@ export ARCH_SRCS	 = cdcacm.c  usart.c
 # string
 #
 TARGETS	= \
-	fmuk66v3_bl \
 	aerofcv1_bl \
 	auavx2v1_bl \
+	avx_v1_bl \
 	crazyflie_bl \
+	cube_f4_bl \
+	fmuk66v3_bl \
+	kakutef7_bl \
 	mindpxv2_bl \
 	omnibusf4sd_bl \
 	px4aerocore_bl \
@@ -73,6 +76,7 @@ TARGETS	= \
 	tapv1_bl \
 	cube_f4_bl \
 	avx_v1_bl \
+	smartap_pro_bl \
 	uvify_core_bl
 
 all:	$(TARGETS) sizes
@@ -91,6 +95,9 @@ fmuk66v3_bl: $(MAKEFILE_LIST) $(LIBKINETIS)
 
 auavx2v1_bl: $(MAKEFILE_LIST) $(LIBOPENCM3)
 	${MAKE} ${MKFLAGS} -f  Makefile.f4 TARGET_HW=AUAV_X2V1  LINKER_FILE=stm32f4.ld TARGET_FILE_NAME=$@
+
+kakutef7_bl: $(MAKEFILE_LIST) $(LIBOPENCM3)
+	${MAKE} ${MKFLAGS} -f  Makefile.f7 TARGET_HW=KAKUTEF7 LINKER_FILE=stm32f7.ld TARGET_FILE_NAME=$@
 
 px4fmu_bl: $(MAKEFILE_LIST) $(LIBOPENCM3)
 	${MAKE} ${MKFLAGS} -f  Makefile.f4 TARGET_HW=PX4_FMU_V1 LINKER_FILE=stm32f4.ld TARGET_FILE_NAME=$@
@@ -137,8 +144,12 @@ cube_f7_bl:$(MAKEFILE_LIST) $(LIBOPENCM3)
 avx_v1_bl:$(MAKEFILE_LIST) $(LIBOPENCM3)
 	${MAKE} ${MKFLAGS} -f  Makefile.f7 TARGET_HW=AV_X_V1 LINKER_FILE=stm32f7.ld TARGET_FILE_NAME=$@
 
+smartap_pro_bl:$(MAKEFILE_LIST) $(LIBOPENCM3)
+	${MAKE} ${MKFLAGS} -f  Makefile.f7 TARGET_HW=SMARTAP_PRO LINKER_FILE=stm32f7.ld TARGET_FILE_NAME=$@
+
 uvify_core_bl: $(MAKEFILE_LIST) $(LIBOPENCM3)
 	${MAKE} ${MKFLAGS} -f  Makefile.f4 TARGET_HW=UVIFY_CORE  LINKER_FILE=stm32f4.ld TARGET_FILE_NAME=$@
+
 # Default bootloader delay is *very* short, just long enough to catch
 # the board for recovery but not so long as to make restarting after a
 # brownout problematic.

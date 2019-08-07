@@ -15,6 +15,7 @@ pipeline {
 
           def nuttx_builds_archive = [
             target: [
+                     "uvify_core_bl",
                      "auavx2v1_bl",
                      "avx_v1_bl",
                      "crazyflie_bl",

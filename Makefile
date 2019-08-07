@@ -72,7 +72,8 @@ TARGETS	= \
 	px4iov3_bl \
 	tapv1_bl \
 	cube_f4_bl \
-	avx_v1_bl
+	avx_v1_bl \
+	uvify_core_bl
 
 all:	$(TARGETS) sizes
 
@@ -136,6 +137,8 @@ cube_f7_bl:$(MAKEFILE_LIST) $(LIBOPENCM3)
 avx_v1_bl:$(MAKEFILE_LIST) $(LIBOPENCM3)
 	${MAKE} ${MKFLAGS} -f  Makefile.f7 TARGET_HW=AV_X_V1 LINKER_FILE=stm32f7.ld TARGET_FILE_NAME=$@
 
+uvify_core_bl: $(MAKEFILE_LIST) $(LIBOPENCM3)
+	${MAKE} ${MKFLAGS} -f  Makefile.f4 TARGET_HW=UVIFY_CORE  LINKER_FILE=stm32f4.ld TARGET_FILE_NAME=$@
 # Default bootloader delay is *very* short, just long enough to catch
 # the board for recovery but not so long as to make restarting after a
 # brownout problematic.
